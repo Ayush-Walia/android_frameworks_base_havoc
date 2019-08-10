@@ -84,6 +84,7 @@
                 android:background="@drawable/rounded_bg_bottom_background">
                 <com.android.systemui.statusbar.phone.ExpandableIndicator
                     android:id="@+id/expandable_indicator"
+                    android:layout_gravity="center"                                                     
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:clipToPadding="false"

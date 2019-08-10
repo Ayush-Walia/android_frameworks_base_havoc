@@ -550,7 +550,7 @@ public class VolumeDialogImpl implements VolumeDialog {
         if (row == null && userTap || row == null &&
                 (mActiveStream == AudioManager.STREAM_RING && !userTap)) {
             addRow(AudioManager.STREAM_RING,
-                    R.drawable.ic_volume_notification, R.drawable.ic_volume_notification_mute, true, false);
+                    R.drawable.ic_volume_ringer, R.drawable.ic_volume_ringer_mute, true, false);
         }
         // Let's check whether we should activate the notification stream.
         row = findRow(AudioManager.STREAM_NOTIFICATION);
