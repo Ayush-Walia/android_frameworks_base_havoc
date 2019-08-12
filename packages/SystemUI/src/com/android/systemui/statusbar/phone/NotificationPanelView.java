@@ -320,6 +320,8 @@ public class NotificationPanelView extends PanelView implements
     private int mStatusBarHeaderHeight;
     private GestureDetector mDoubleTapGesture;
 
+    protected StatusBar statusbar = new StatusBar();
+
     public NotificationPanelView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setWillNotDraw(!DEBUG);
@@ -690,7 +692,7 @@ public class NotificationPanelView extends PanelView implements
         if (!canPanelBeCollapsed()) {
             return;
         }
-
+	Log.v(TAG, "collapse() inside NotificationPanel View");
         if (mQsExpanded) {
             mQsExpandImmediate = true;
             mNotificationStackScroller.setShouldShowShelfOnly(true);
@@ -701,6 +703,12 @@ public class NotificationPanelView extends PanelView implements
     public void closeQs() {
         cancelQsAnimation();
         setQsExpansion(mQsMinExpansionHeight);
+	try{
+	statusbar.hideDismissAnimate(true);
+	}catch(Exception e){
+	Log.v(TAG, "closeQs() crashed, RIP");
+	}
+	Log.v(TAG, "closeQs() inside NotificationPanel View");
     }
 
     public void animateCloseQs() {
@@ -708,6 +716,7 @@ public class NotificationPanelView extends PanelView implements
             if (!mQsAnimatorExpand) {
                 return;
             }
+	    Log.v(TAG, "animateCloseQs() inside NotificationPanel View");
             float height = mQsExpansionHeight;
             mQsExpansionAnimator.cancel();
             setQsExpansion(height);

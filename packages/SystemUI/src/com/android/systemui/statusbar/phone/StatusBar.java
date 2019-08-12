@@ -342,8 +342,8 @@ public class StatusBar extends SystemUI implements DemoMode,
     private static final String BANNER_ACTION_SETUP =
             "com.android.systemui.statusbar.banner_action_setup";
     public static final String TAG = "StatusBar";
-    public static final boolean DEBUG = false;
-    public static final boolean SPEW = false;
+    public static final boolean DEBUG = true;
+    public static final boolean SPEW = true;
     public static final boolean DUMPTRUCK = true; // extra dumpsys info
     public static final boolean DEBUG_GESTURES = false;
     public static final boolean DEBUG_MEDIA_FAKE_ARTWORK = false;
@@ -1542,7 +1542,8 @@ public class StatusBar extends SystemUI implements DemoMode,
         mDismissAllButton = mStatusBarWindow.findViewById(R.id.clear_notifications);
         mDismissAllButton.setOnClickListener(v -> {
             mMetricsLogger.action(MetricsEvent.ACTION_DISMISS_ALL_NOTES);
-            clearAllNotifications();
+            hideDismissAnimate(true);
+	    clearAllNotifications();
         });
     }
 
@@ -1779,6 +1780,7 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         // Do not modify the notifications during collapse.
         if (isCollapsing()) {
+	    Log.v(TAG, "isCollapsing called");
             addPostCollapseAction(this::updateNotificationViews);
             return;
         }
@@ -1862,19 +1864,42 @@ public class StatusBar extends SystemUI implements DemoMode,
 
     @VisibleForTesting
     protected void updateFooter() {
-        boolean showDismissView = mClearAllEnabled && hasActiveClearableNotifications() && mNotificationPanel.isFullyExpanded();
-        boolean showFooterView = ((!showDismissView && mEntryManager.getNotificationData().getActiveNotifications().size() == 0) || mState == 1 || mRemoteInputManager.getController().isRemoteInputActive()) ? false : true;
+        boolean showDismissView = mClearAllEnabled && hasActiveClearableNotifications();
+	boolean showFooterView = (showDismissView ||
+                        mEntryManager.getNotificationData().getActiveNotifications().size() != 0)
+                && mState != StatusBarState.KEYGUARD
+                && !mRemoteInputManager.getController().isRemoteInputActive();
+        //boolean showFooterView = ((!showDismissView && mEntryManager.getNotificationData().getActiveNotifications().size() == 0) || mState == 1 || mRemoteInputManager.getController().isRemoteInputActive()) ? false : true;
         mStackScroller.updateFooterView(showFooterView, false);
-        if (showDismissView) {
+	if (mNotificationPanel.isFullyExpanded()) {
+	   Log.v(TAG, "isFullyExpanded");
+	}
+
+        if (mNotificationPanel.isFullyCollapsed()) {
+           Log.v(TAG, "isFullyCollapsed");
+        }
+
+        if (mNotificationPanel.isQsExpanded()) {
+           Log.v(TAG, "isQsExpanded");
+        }
+
+/*        if (mNotificationPanel.isQsCollapsed()) {
+           Log.v(TAG, "isQsCollapsed");
+        }*/
+	if (showDismissView) {
             showDismissAnimate(true);
             return;
         }
-        hideDismissAnimate(true);
+	if (mDismissShow == true) {
+	    hideDismissAnimate(true);
+	}
     }
 
     public void showDismissAnimate(boolean animate) {
+	Log.v(TAG, "showDismissAnimate Called");
         if (getBarState() != 1 && !mNotificationPanel.isQsExpanded()) {
             if (!mDismissShow) {
+		Log.v(TAG, "showDismissAnimate Working");
                 mDismissShow = true;
                 Animation a = AnimationUtils.loadAnimation(mContext, R.anim.dismiss_all_show);
                 mDismissAllButton.setVisibility(View.VISIBLE);
@@ -1884,7 +1909,9 @@ public class StatusBar extends SystemUI implements DemoMode,
     }
 
     public void hideDismissAnimate(boolean animate) {
+	Log.v(TAG, "hideDismissAnimate Called");
         if (mDismissShow) {
+	    Log.v(TAG, "hideDismissAnimate Working");
             mDismissShow = false;
             Animation a = AnimationUtils.loadAnimation(mContext, R.anim.dismiss_all_hide);
             a.setAnimationListener(new AnimationListener() {
@@ -2370,10 +2397,17 @@ public class StatusBar extends SystemUI implements DemoMode,
     }
 
     public void setQsExpanded(boolean expanded) {
-        if (expanded) {
+	if (expanded) {
+            Log.v(TAG, "expanded condition");
             hideDismissAnimate(true);
-        } else if (hasActiveClearableNotifications()) {
-            showDismissAnimate(true);
+        }
+        if (!expanded && hasActiveClearableNotifications()) {
+	    showDismissAnimate(true);
+            Log.v(TAG, "!expanded condition");
+	//    hideDismissAnimate(true);
+        } else if (expanded && hasActiveClearableNotifications()) {
+           Log.v(TAG, "expanded and hasactive condition"); 
+	  // showDismissAnimate(true);
         }
         mStatusBarWindowManager.setQsExpanded(expanded);
         mNotificationPanel.setStatusAccessibilityImportance(expanded
@@ -2948,6 +2982,7 @@ public class StatusBar extends SystemUI implements DemoMode,
             mStatusBarWindowManager.setStatusBarFocusable(false);
 
             mStatusBarWindow.cancelExpandHelper();
+	    Log.v(TAG, "animateCollapsePanels() from StatusBar Called");
             mStatusBarView.collapsePanel(true /* animate */, delayed, speedUpFactor);
         }
     }
@@ -2995,6 +3030,8 @@ public class StatusBar extends SystemUI implements DemoMode,
 
     public void animateCollapseQuickSettings() {
         if (mState == StatusBarState.SHADE) {
+	    hideDismissAnimate(true);
+	    Log.v(TAG, "animateCollapseQuickSettings() called from statusbar");
             mStatusBarView.collapsePanel(true, false /* delayed */, 1.0f /* speedUpFactor */);
         }
     }
@@ -3011,6 +3048,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         mStatusBarView.collapsePanel(/*animate=*/ false, false /* delayed*/,
                 1.0f /* speedUpFactor */);
 
+	Log.v(TAG, "called closeQs() from within statusbar");
         mNotificationPanel.closeQs();
 
         mExpandedVisible = false;
@@ -5206,7 +5244,9 @@ public class StatusBar extends SystemUI implements DemoMode,
         touchAutoDim();
         mNotificationShelf.setStatusBarState(state);
         if (mState == 1) {
-            hideDismissAnimate(true);
+	    Log.v(TAG, "mState == 1");
+	    mDismissShow = true;
+	    hideDismissAnimate(true);
         }
     }
 
