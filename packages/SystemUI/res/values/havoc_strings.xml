@@ -287,5 +287,6 @@
     
     <!-- Alerting notification header label -->
     <string name="notification_section_header_alerting">Alerting notifications</string>
+    <string name="usage_data">used</string>
 
 </resources>
