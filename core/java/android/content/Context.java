@@ -4695,11 +4695,6 @@ public abstract class Context {
      */
     public static final String POCKET_SERVICE = "pocket";
 
-    /**
-     * Long screenshot
-     * @hide
-     */
-    public static final String LONGSCREENSHOT_SERVICE = "longshot";
 
     /**
      * Use with {@link #getSystemService} to retrieve a
