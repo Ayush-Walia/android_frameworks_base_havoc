@@ -289,4 +289,6 @@
     <string name="notification_section_header_alerting">Alerting notifications</string>
     <string name="usage_data">used</string>
 
+    <!-- Daily data usage -->
+    <string name="daily_data_usage_title">Today\'s usage</string>
 </resources>
