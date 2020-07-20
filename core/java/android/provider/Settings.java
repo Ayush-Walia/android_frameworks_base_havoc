@@ -6626,13 +6626,7 @@ public final class Settings {
                 BOOLEAN_VALIDATOR;
 
         /**
-         * Data usage period
-         * 0: Daily
-         * 1: Monthly
-         * @hide
-         */
-        public static final String DATA_USAGE_PERIOD = "data_usage_period";
-
+        
         /**
          * Whether to tint the QS tiles with accent color
          * @hide
